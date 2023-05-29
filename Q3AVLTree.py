@@ -302,23 +302,225 @@ class TreeNode:
       self.element = e
       self.left = None # Point to the left node, default None
       self.right = None # Point to the right node, default None
+
+#############################################
+outputdebug = True 
+
+def debug(msg):
+    if outputdebug:
+        print (msg)
+        
+class Node():
+    def __init__(self, key):
+        self.key = key
+        self.left = None 
+        self.right = None 
+
+class AVLTree():
+    def __init__(self, *args):
+        self.node = None 
+        self.height = -1  
+        self.balance = 0; 
+        
+        if len(args) == 1: 
+            for i in args[0]: 
+                self.insert(i)
+                
+    def height(self):
+        if self.node: 
+            return self.node.height 
+        else: 
+            return 0 
+    
+    def is_leaf(self):
+        return (self.height == 0) 
+    
+    def insert(self, key):
+        tree = self.node
+        
+        newnode = Node(key)
+        
+        if tree == None:
+            self.node = newnode 
+            self.node.left = AVLTree() 
+            self.node.right = AVLTree()
+            debug("Inserted key [" + str(key) + "]")
+        
+        elif key < tree.key: 
+            self.node.left.insert(key)
+            
+        elif key > tree.key: 
+            self.node.right.insert(key)
+        
+        else: 
+            debug("Key [" + str(key) + "] already in tree.")
+            
+        self.rebalance() 
+        
+    def rebalance(self):
+        ''' 
+        Rebalance a particular (sub)tree
+        ''' 
+        # key inserted. Let's check if we're balanced
+        self.update_heights(False)
+        self.update_balances(False)
+        while self.balance < -1 or self.balance > 1: 
+            if self.balance > 1:
+                if self.node.left.balance < 0:  
+                    self.node.left.lrotate() # we're in case II
+                    self.update_heights()
+                    self.update_balances()
+                self.rrotate()
+                self.update_heights()
+                self.update_balances()
+                
+            if self.balance < -1:
+                if self.node.right.balance > 0:  
+                    self.node.right.rrotate() # we're in case III
+                    self.update_heights()
+                    self.update_balances()
+                self.lrotate()
+                self.update_heights()
+                self.update_balances()
+
+
+            
+    def rrotate(self):
+        # Rotate left pivoting on self
+        debug ('Rotating ' + str(self.node.key) + ' right') 
+        A = self.node 
+        B = self.node.left.node 
+        T = B.right.node 
+        
+        self.node = B 
+        B.right.node = A 
+        A.left.node = T 
+
+    
+    def lrotate(self):
+        # Rotate left pivoting on self
+        debug ('Rotating ' + str(self.node.key) + ' left') 
+        A = self.node 
+        B = self.node.right.node 
+        T = B.left.node 
+        
+        self.node = B 
+        B.left.node = A 
+        A.right.node = T 
+        
+            
+    def update_heights(self, recurse=True):
+        if not self.node == None: 
+            if recurse: 
+                if self.node.left != None: 
+                    self.node.left.update_heights()
+                if self.node.right != None:
+                    self.node.right.update_heights()
+            
+            self.height = max(self.node.left.height,
+                              self.node.right.height) + 1 
+        else: 
+            self.height = -1 
+            
+    def update_balances(self, recurse=True):
+        if not self.node == None: 
+            if recurse: 
+                if self.node.left != None: 
+                    self.node.left.update_balances()
+                if self.node.right != None:
+                    self.node.right.update_balances()
+
+            self.balance = self.node.left.height - self.node.right.height 
+        else: 
+            self.balance = 0 
+
+
+    def logical_predecessor(self, node):
+        ''' 
+        Find the biggest valued node in LEFT child
+        ''' 
+        node = node.left.node 
+        if node != None: 
+            while node.right != None:
+                if node.right.node == None: 
+                    return node 
+                else: 
+                    node = node.right.node  
+        return node 
+    
+    def logical_successor(self, node):
+        ''' 
+        Find the smallese valued node in RIGHT child
+        ''' 
+        node = node.right.node  
+        if node != None: # just a sanity check  
+            
+            while node.left != None:
+                debug("LS: traversing: " + str(node.key))
+                if node.left.node == None: 
+                    return node 
+                else: 
+                    node = node.left.node  
+        return node 
+
+    def check_balanced(self):
+        if self == None or self.node == None: 
+            return True
+        
+        # We always need to make sure we are balanced 
+        self.update_heights()
+        self.update_balances()
+        return ((abs(self.balance) < 2) and self.node.left.check_balanced() and self.node.right.check_balanced())  
+        
+    def inorder_traverse(self):
+        if self.node == None:
+            return [] 
+        
+        inlist = [] 
+        l = self.node.left.inorder_traverse()
+        for i in l: 
+            inlist.append(i) 
+
+        inlist.append(self.node.key)
+
+        l = self.node.right.inorder_traverse()
+        for i in l: 
+            inlist.append(i) 
+    
+        return inlist 
+
+    def display(self, level=0, pref=''):
+        '''
+        Display the whole tree (but turned 90 degrees counter-clockwisely). Uses recursive def.
+        '''        
+        self.update_heights()  # Must update heights before balances 
+        self.update_balances()  
+        if(self.node != None): 
+            if self.node.left != None:
+                self.node.right.display(level + 2, '>')
+            print (' ' * level * 2, pref, self.node.key, "[" + str(self.height) + ":" + str(self.balance) + "]", 'L' if self.is_leaf() else ' ')    
+            if self.node.left != None: 
+                self.node.left.display(level + 2, '<')
+    def getNode(self):
+        return self.node
+      
+#############################################
 #method displays the options that the user can pick from    
 def optionDisplay(displayNumber):     
     if displayNumber == 1:
-        print("\nQuestion 2: Application to binary tree traversal & BST\n")
-        print("\n1. Pre-load a sequence of integers to build a BST \n")
-        print("2. Manually enter integer values, one by one, to build a BST\n")
+        print("\nQuestion 3: AVL tree: deleting a node\n")
+        print("\n1. Pre-load a sequence of integers to build a AVL tree \n")
+        print("2. Manually enter integer values/keys, one by one, to build an AVL tree\n")
         print("3. Exit\n")
     elif displayNumber == 2:
-        print("\n\nQuestion 2: Application to binary tree traversal & BST\n")
-        print("1. Display the tree shape of current BST, and then show the pre-order, in-order, post-order and inverse-in-order traversal sequences of the BST\n")
-        print("2. Show all leaf nodes of the BST, and all non-leaf nodes (separately)\n")
-        print("3. Show a sub-tree and count its nodes\n")
-        print("4. Show the depth of a given node in the BST\n")
-        print("5. Show the depth of a subtree of the BST\n")
-        print("6. Insert a new integer key into the BST\n")
-        print("7. Delete an integer key from the BST\n")
-        print("8. Exit\n")
+        print("\n\nQuestion 3: AVL tree: deleting a node\n")
+        print("1. Display the AVL tree, showing the height and balance factor for each node.\n")
+        print("2. Print the pre-order, in-order, and post-order traversal sequences of the AVL tree\n")
+        print("3. Print all leaf nodes of the AVL tree, and all non-leaf nodes (separately)\n")
+        print("4. Insert a new integer key into the AVL tree\n")
+        print("5. Delete an integer key from the AVL tree\n")
+        print("6. Exit\n")
+       
  
         
 #this method accepts only valid integer which can be used choose an option  
@@ -349,10 +551,13 @@ def menuOneOption(optionNumber):
 def menuTwoOption(sequence):
     bTree = BinaryTree()
     inputtoTree(bTree, sequence)
+    aTree = AVLTree()    
+    inputtoTree(aTree, sequence)
+    
     while True:
-        optionNumber = optionInput(9, 0, 2)
+        optionNumber = optionInput(7, 0, 2)
         if optionNumber == 1:
-            menuTwoOptionOne(bTree)
+            menuTwoOptionOne(aTree)
         elif optionNumber == 2:
             menuTwoOptionTwo(bTree)
         elif optionNumber == 3:
@@ -360,11 +565,7 @@ def menuTwoOption(sequence):
         elif optionNumber == 4:
             menuTwoOptionFour(bTree)
         elif optionNumber == 5:
-            menuTwoOptionFive(bTree)
-        elif optionNumber == 6:
-            menuTwoOptionSix(bTree)
-        elif optionNumber == 7:
-            menuTwoOptionSeven(bTree)          
+            menuTwoOptionFive(bTree)          
         else:
             break
         
@@ -372,7 +573,7 @@ def menuTwoOption(sequence):
 #first option us the pre loaded sequence. it will be sorted and displayed as a balanced binary tree
 def menuOneOptionOne():
     #the sequence below was required to be tested
-     preSequence = [58, 84, 68, 23, 38, 82, 26, 17, 24, 106, 95, 48, 88, 54, 50, 51, 53, 49, -6, -46]
+     preSequence = [58, 82, -55, 20, 35, 79, 23, 14, 0, -21, 103, 92, 44, 84, 50, 46, 47, 49, 45, 72, 89]
 
     #use this sequence below if you want to test another sequence
     #preSequence = [-2, 17, 94, -55, 36, -9, 12, -83, 68, 7, -76, 45, -30, 59, 0, -42, 81, -98, 23]
@@ -406,57 +607,34 @@ def inputInteger():
                 print("Invalid input!!! Please enter a valid integer or 'x' to finish.")
     return userInput
 
-def inputtoTree(bTree, sequence):    
+def inputtoTree(Tree, sequence):    
     for element in sequence:
-        bTree.insert(element)
+        Tree.insert(element)
     return
 
 def menuTwoOptionOne(bTree):
-     printTree(bTree.getRoot())
+     printTree(bTree.getNode())
      
-     print("\nPre-Order Traversal:\n")
-     bTree.preorder()
-     print("\n\nIn-Order Traversal:\n")
-     bTree.inorder()
-     print("\n\nPost-Order Traversal:\n")
-     bTree.postorder()
-     print("\n\nInverse-In-Order Traversal:\n")
-     bTree.inverse_inorder()
+     
      
 def menuTwoOptionTwo(bTree):
-     print("\nAll Leaf nodes:\n")
-     bTree.leaf_BST()
-     print("\n\nAll Non-leaf nodes:\n")
-     bTree.non_leaf_BST()
+    print("\nPre-Order Traversal:\n")
+    bTree.preorder()
+    print("\n\nIn-Order Traversal:\n")
+    bTree.inorder()
+    print("\n\nPost-Order Traversal:\n")
+    bTree.postorder()
+    print("\n\nInverse-In-Order Traversal:\n")
+    bTree.inverse_inorder() 
      
 def menuTwoOptionThree(bTree):
-     try:
-         number = input("Enter a integer: ")
-         number = int(number)
-         bTree.total_nodesBST(number)
-     except ValueError:
-         print("Invalid input!!! Please enter a valid integer")
+    print("\nAll Leaf nodes:\n")
+    bTree.leaf_BST()
+    print("\n\nAll Non-leaf nodes:\n")
+    bTree.non_leaf_BST()
      
 
 def menuTwoOptionFour(bTree):
-    try:
-         number = input("Enter a integer: ")
-         number = int(number)
-         bTree.depth_nodeBST(number)
-    except ValueError:
-         print("Invalid input!!! Please enter a valid integer")
-    
-
-def menuTwoOptionFive(bTree):
-    try:
-         number = input("Enter a integer: ")
-         number = int(number)
-         bTree.depth_subtreeBST(number)
-    except ValueError:
-         print("Invalid input!!! Please enter a valid integer")
-     
-    
-def menuTwoOptionSix(bTree):
     try:
          number = input("Enter a integer: ")
          number = int(number)
@@ -467,9 +645,9 @@ def menuTwoOptionSix(bTree):
         print("\nInteger", number, "has been inserted into the BST")
         print("\n\nInverse-In-Order Traversal:\n")
         bTree.inverse_inorder()
+    
 
-        
-def menuTwoOptionSeven(bTree):
+def menuTwoOptionFive(bTree):
     try:
          number = input("Enter a integer: ")
          number = int(number)
@@ -480,6 +658,8 @@ def menuTwoOptionSeven(bTree):
         print("\nInteger", number, "has been deleted into the BST")
         print("\n\nInverse-In-Order Traversal:\n")
         bTree.inverse_inorder()
+     
+    
 
 #####################################################################
       
