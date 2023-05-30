@@ -477,7 +477,7 @@ def menuTwoOptionSeven(bTree):
     except ValueError:
          print("Invalid input!!! Please enter a valid integer")
     if deleted == True:
-        print("\nInteger", number, "has been deleted into the BST")
+        print("\nInteger", number, "has been deleted from BST")
         print("\n\nInverse-In-Order Traversal:\n")
         bTree.inverse_inorder()
 

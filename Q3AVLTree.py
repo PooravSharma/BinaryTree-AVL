@@ -284,35 +284,38 @@ class AVLTree():
         
     #Delete a node from the tree
     def delete_(self, key):
-        if self.search(key):
+        if self.search(key)[0]:
             node = self.search(key)[1]
-            self.delete_Helper(node, key)
+            self.delete_Helper(key)
             return True, self.node
         else:
             print("\nERROR: Node", key ," not found!")
             return False, key
 
-    def delete_Helper(self, node, key):
-        if node is None:
-            return node
+    def delete_Helper(self, key):
+        if self.node is None:
+            return self.node
 
-        if key < node.key:
-            node.left.node = self.delete_Helper(node.left.node, key)
-        elif key > node.key:
-            node.right.node = self.delete_Helper(node.right.node, key)
+        if key < self.node.key:
+            self.node.left.delete_Helper(key)
+        elif key > self.node.key:
+            self.node.right.delete_Helper(key)
         else:
-            if node.left.node is None and node.right.node is None:
-                return None
-            if node.left.node is None:
-                return node.right.node
-            if node.right.node is None:
-                return node.left.node
-            successor = self.logical_successor(node)
-            node.key = successor.key
-            node.right.node = self.delete_Helper(node.right.node, successor.key)
+            if self.node.left.node is None and self.node.right.node is None:
+                self.node = None
+                return self.node
+            if self.node.left.node is None:
+                self.node = self.node.right.node
+                return self.node
+            if self.node.right.node is None:
+                self.node = self.node.left.node
+                return self.node
+            successor = self.logical_successor(self.node)
+            self.node.key = successor.key
+            self.node.right.delete_Helper(successor.key)
 
         self.rebalance()
-        return node
+        return self.node
     
     def findSuc(self, node):
         while self.node.left is not None:
@@ -530,7 +533,7 @@ def menuTwoOptionFive(aTree):
     except ValueError:
          print("Invalid input!!! Please enter a valid integer")
     if deleted == True:
-        print("\nInteger", number, "has been deleted into the AVL")
+        print("\nInteger", number, "has been deleted from AVL")
         
      
     
