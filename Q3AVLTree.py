@@ -1,320 +1,14 @@
 #Student ID: 10636908
 #Name: Poorav Sharma 
 
-"""code from Pearson Education, Inc p104 """
-##  https://stackoverflow.com/questions/34012886/print-binary-tree-level-by-level-in-python
-##  AUTHOR: Original: J.V.     Edit: BcK
-#Used to print the binary tree
-def printTree(root, element="element", left="left", right="right"):                                
-    def display(root, element=element, left=left, right=right):                                     
-        """Returns list of strings, width, height, and horizontal coordinate of the root."""
-        # No child.
-        if getattr(root, right) is None and getattr(root, left) is None:
-            line = '%s' % getattr(root, element)
-            width = len(line)
-            height = 1
-            middle = width // 2
-            return [line], width, height, middle
-
-        # Only left child.
-        if getattr(root, right) is None:
-            lines, n, p, x = display(getattr(root, left))
-            s = '%s' % getattr(root, element)
-            u = len(s)
-            first_line = (x + 1) * ' ' + (n - x - 1) * '_' + s
-            second_line = x * ' ' + '/' + (n - x - 1 + u) * ' '
-            shifted_lines = [line + u * ' ' for line in lines]
-            return [first_line, second_line] + shifted_lines, n + u, p + 2, n + u // 2
-
-        # Only right child.
-        if getattr(root, left) is None:
-            lines, n, p, x = display(getattr(root, right))
-            s = '%s' % getattr(root, element)
-            u = len(s)
-            first_line = s + x * '_' + (n - x) * ' '
-            second_line = (u + x) * ' ' + '\\' + (n - x - 1) * ' '
-            shifted_lines = [u * ' ' + line for line in lines]
-            return [first_line, second_line] + shifted_lines, n + u, p + 2, u // 2
-
-        # Two children.
-        left, n, p, x = display(getattr(root, left))
-        right, m, q, y = display(getattr(root, right))
-        s = '%s' % getattr(root, element)
-        u = len(s)
-        first_line = (x + 1) * ' ' + (n - x - 1) * '_' + s + y * '_' + (m - y) * ' '
-        second_line = x * ' ' + '/' + (n - x - 1 + u + y) * ' ' + '\\' + (m - y - 1) * ' '
-        if p < q:
-            left += [n * ' '] * (q - p)
-        elif q < p:
-            right += [m * ' '] * (p - q)
-        zipped_lines = zip(left, right)
-        lines = [first_line, second_line] + [a + u * ' ' + b for a, b in zipped_lines]
-        return lines, n + m + u, max(p, q) + 2, n + u // 2
-    
-    lines = []
-    if root != None:
-        lines, *_ = display(root, element, left, right)
-    print("\t== Binary Tree: shape ==")
-    print()
-    if lines == []:
-        print("\t  No tree found")
-    for line in lines:
-        print("\t", line)
-    print()
-###################################################
-
-################  Classes and Methods  #################################
-class BinaryTree:
-    def __init__(self):
-        self.root = None
-        self.size = 0
-
-    # Return True if the element is in the tree
-    def search(self, e):
-        current = self.root # Start from the root
-
-        while current != None:
-            if e < current.element:
-                current = current.left
-            elif e > current.element:
-                current = current.right
-            else: # element matches current.element
-                return True , current # Element is found
-
-        return False
-     # Find the depth of a given node in the BST
-    def depth_nodeBST(self, N):
-        current = self.root
-        depth = 0
-        while current != None:
-            if N < current.element:
-                current = current.left
-                depth += 1
-            elif N > current.element:
-                current = current.right
-                depth += 1
-            else: # element matches current.element and return the depth of where it was found
-                print("\nThe depth of node ",N," in the BTS is: ", depth)
-                return  
-                
-                return 
-        print("\nERROR: Node ", N, " not found in BST")
-        return 
-    # Insert element e into the binary search tree
-    # Return True if the element is inserted successfully
-    def insert(self, e):
-        if self.root == None:
-          self.root = self.createNewNode(e) # Create a new root
-        else:
-          # Locate the parent node
-          parent = None
-          current = self.root
-          while current != None:
-            if e < current.element:
-              parent = current
-              current = current.left
-            elif e > current.element:
-              parent = current
-              current = current.right
-            else:
-                print("ERROR: node key ",e," already exists in the BST")#Lets the user know the key is already in a node in the BST
-                return False # Duplicate node? not inserted
-
-          # Create the new node and attach it to the parent node
-          if e < parent.element:
-            parent.left = self.createNewNode(e)
-          else:
-            parent.right = self.createNewNode(e)
-
-        self.size += 1 # Increase tree size
-        return True # Element inserted
-
-    # Create a new TreeNode for element e
-    def createNewNode(self, e):
-      return TreeNode(e)
-    """
-    # Return the size of the tree
-    def getSize(self):
-    
-      return self.size"""
-    #one prints all leaf nodes
-    def leaf_BST(self):
-        self.leaf_BSTHelper(self.root)
-        
-    def leaf_BSTHelper(self, r):
-      if r != None:
-        self.leaf_BSTHelper(r.left)       
-        self.leaf_BSTHelper(r.right)
-        if not r.left and not r.right:
-            print(r.element, end = ", ")
-            return
-
-    #one prints all non_leaf nodes
-    def non_leaf_BST(self):
-        self.non_leaf_BSTHelper(self.root)
-        
-    def non_leaf_BSTHelper(self, r):
-      if r != None:
-        self.non_leaf_BSTHelper(r.left)       
-        self.non_leaf_BSTHelper(r.right)
-        if r.left or r.right:
-            print(r.element, end = ", ")
-            return
-        
-    # Inverse-Inorder traversal from the root
-    def inverse_inorder(self):
-      self.inverse_inorderHelper(self.root)
-
-    # Inverse-Inorder traversal from a subtree
-    def inverse_inorderHelper(self, r):
-      if r != None:       
-        self.inverse_inorderHelper(r.right)
-        print(r.element, end = ", ")
-        self.inverse_inorderHelper(r.left)
-        
-    
-    # Inorder traversal from the root
-    def inorder(self):
-      self.inorderHelper(self.root)
-
-    # Inorder traversal from a subtree
-    def inorderHelper(self, r):
-      if r != None:
-        self.inorderHelper(r.left)
-        print(r.element, end = ", ")
-        self.inorderHelper(r.right)
-
-    # Postorder traversal from the root
-    def postorder(self):
-      self.postorderHelper(self.root)
-
-    # Postorder traversal from a subtree
-    def postorderHelper(self, root):
-      if root != None:
-        self.postorderHelper(root.left)
-        self.postorderHelper(root.right)
-        print(root.element, end = ", ")
-
-    # Preorder traversal from the root
-    def preorder(self):
-      self.preorderHelper(self.root)
-
-    # Preorder traversal from a subtree
-    def preorderHelper(self, root):
-      if root != None:
-        print(root.element, end = ", ")
-        self.preorderHelper(root.left)
-        self.preorderHelper(root.right)
-
-    # total subtree node count and all the subtree node of a specific node 
-    def total_nodesBST(self, N):
-        if self.search(N):
-            root = self.search(N)[1]
-            print("The nodes of subtree ", N, ": \n")
-            nodeCount = self.total_nodesBSTHelper(root)
-            print("\nTotal number of node: ", nodeCount)
-            
-        else:
-            print("\nERROR: Node ", N ," not found!")
-    # total subtree node count and all the subtree node of a specific node 
-    def total_nodesBSTHelper(self, root):
-        nodeCount = 0
-        if root != None:
-            nodeCount += 1
-            print(root.element, end = " ")
-            nodeCount +=self.total_nodesBSTHelper(root.left)
-            nodeCount +=self.total_nodesBSTHelper(root.right)
-        return nodeCount
-    # Finding the depth of the subtree using Postorder traversal
-    def depth_subtreeBST(self, N):
-      if self.search(N):
-        root = self.search(N)[1]            
-        depth = self.depth_subtreeBSTHelper(root)-1#to make it start from 0
-        print("\nThe depth of subtree rooted at node ", N, " is: ",depth)            
-      else:
-        print("\nERROR: Subtree rooted at node ", N ," not found!")
-
-    # Finding the depth of the subtree using Postorder traversal
-    def depth_subtreeBSTHelper(self, root):
-        depth = 0    
-        if root != None:
-            leftDepth = self.depth_subtreeBSTHelper(root.left)
-            rightDepth = self.depth_subtreeBSTHelper(root.right)
-            depth = max(leftDepth, rightDepth)+1       
-        
-        return depth 
-    #Delete a node from the tree
-    def delete_(self, key):
-        
-        if self.search(key):
-            root = self.search(key)[1]
-            self.delete_Helper(self.root, key)
-            return True, root
-        else:
-           print("\nERROR: Node", key ," not found!")
-           return False, key   
-    def delete_Helper(self, root,  key):
-
-        if root is None:
-            return root
-
-        if key < root.element:
-            root.left = self.delete_Helper(root.left, key)
-        elif key > root.element:
-            root.right = self.delete_Helper(root.right, key)
-        else:
-            # Case 1: Node to be deleted is a leaf node (has no children)
-            if root.left is None and root.right is None:
-                return None
-
-            # Case 2: Node to be deleted has only one child
-            if root.left is None:
-                return root.right
-            elif root.right is None:
-                return root.left
-            successor = self.findSuc(root.right)
-            root.element = successor.element
-            root.right = self.delete_Helper(root.right, successor.element)
-            
-        return root
-
-    def findSuc(self, node):
-        currentRoot = node
-        while currentRoot.left is not None:
-            currentRoot = currentRoot.left
-        return currentRoot
-
-    # Return true if the tree is empty
-    def isEmpty(self):
-      return self.size == 0
-
-    # Remove all elements from the tree
-    def clear(self):
-      self.root == None
-      self.size == 0
-
-    # Return the root of the tree
-    def getRoot(self):
-      return self.root
-
-class TreeNode:
-    def __init__(self, e):
-      self.element = e
-      self.left = None # Point to the left node, default None
-      self.right = None # Point to the right node, default None
-
 #############################################
+
+
 outputdebug = True 
 
 def debug(msg):
     if outputdebug:
         print (msg)
-        
-class Node():
-    def __init__(self, key):
-        self.key = key
-        self.left = None 
-        self.right = None 
 
 class AVLTree():
     def __init__(self, *args):
@@ -325,7 +19,7 @@ class AVLTree():
         if len(args) == 1: 
             for i in args[0]: 
                 self.insert(i)
-                
+#######################################                
     def height(self):
         if self.node: 
             return self.node.height 
@@ -501,19 +195,204 @@ class AVLTree():
             print (' ' * level * 2, pref, self.node.key, "[" + str(self.height) + ":" + str(self.balance) + "]", 'L' if self.is_leaf() else ' ')    
             if self.node.left != None: 
                 self.node.left.display(level + 2, '<')
+                '''
     def getNode(self):
         return self.node
-      
+                '''
+    
+    def preorder_traverse(self):
+        if self.node == None:
+            return [] 
+        
+        inlist2 = []
+        inlist2.append(self.node.key)
+        inlist2 += self.node.left.preorder_traverse()
+
+        inlist2 += self.node.right.preorder_traverse()
+    
+        return inlist2
+    
+    def postorder_traverse(self):
+        if self.node == None:
+            return [] 
+        
+        inlist3 = []        
+        inlist3 += self.node.left.postorder_traverse()
+        inlist3 += self.node.right.postorder_traverse()
+        
+        inlist3.append(self.node.key)
+        return inlist3
+
+    
+    def inorder_traverse(self):
+        if self.node == None:
+            return [] 
+        
+        inlist = [] 
+        l = self.node.left.inorder_traverse()
+        for i in l: 
+            inlist.append(i) 
+
+        inlist.append(self.node.key)
+
+        l = self.node.right.inorder_traverse()
+        for i in l: 
+            inlist.append(i) 
+    
+        return inlist
+    
+
+     #one prints all leaf nodes
+    def leaf_AVL(self):
+        self.leaf_AVLHelper(self.node)
+        
+    def leaf_AVLHelper(self, r):
+      if r != None:
+        self.leaf_AVLHelper(r.left.node)       
+        self.leaf_AVLHelper(r.right.node)
+        if not r.left.node and not r.right.node:
+            print(r.key, end = ", ")
+            return
+
+    #one prints all non_leaf nodes
+    def non_leaf_AVL(self):
+        self.non_leaf_AVLHelper(self.node)
+        
+    def non_leaf_AVLHelper(self, r):
+      if r != None:
+        self.non_leaf_AVLHelper(r.left.node)       
+        self.non_leaf_AVLHelper(r.right.node)
+        if r.left.node or r.right.node:
+            print(r.key, end = ", ")
+            return
+        
+
+    # Return True if the element is in the tree
+    def search(self, e):
+        node = self.node
+    # Start from the root
+        while node is not None:
+            if e < node.key:
+                node = node.left.node
+            elif e > node.key:
+                node = node.right.node
+            else:  # element matches current.element
+                return True, node  # Element is found
+
+        return False, None 
+
+        
+    #Delete a node from the tree
+    def delete_(self, key):
+        if self.search(key):
+            node = self.search(key)[1]
+            self.delete_Helper(node, key)
+            return True, self.node
+        else:
+            print("\nERROR: Node", key ," not found!")
+            return False, key
+
+    def delete_Helper(self, node, key):
+        if node is None:
+            return node
+
+        if key < node.key:
+            node.left.node = self.delete_Helper(node.left.node, key)
+        elif key > node.key:
+            node.right.node = self.delete_Helper(node.right.node, key)
+        else:
+            if node.left.node is None and node.right.node is None:
+                return None
+            if node.left.node is None:
+                return node.right.node
+            if node.right.node is None:
+                return node.left.node
+            successor = self.logical_successor(node)
+            node.key = successor.key
+            node.right.node = self.delete_Helper(node.right.node, successor.key)
+
+        self.rebalance()
+        return node
+    
+    def findSuc(self, node):
+        while self.node.left is not None:
+            node = self.node.left
+        return node
+    
+    def printTree(self):                                
+        def display(root):                                     
+            """Returns list of strings, width, height, and horizontal coordinate of the root."""
+            #   No child.
+            if root.node.right.node is None and root.node.left.node is None:
+                line = str(root.node.key)
+                width = len(line)
+                height = 1
+                middle = width // 2
+                return [line], width, height, middle
+
+            #   Only left child.
+            if root.node.right.node is None:
+                lines, n, p, x = display(root.node.left)
+                nodeOutput = (str(root.node.key) )
+                keyLength = len(nodeOutput)
+                first_line = (x + 1) * ' ' + (n - x - 1) * '_' + nodeOutput
+                second_line = x * ' ' + '/' + (n - x - 1 + keyLength) * ' '
+                shifted_lines = [line + keyLength * ' ' for line in lines]
+                return [first_line, second_line] + shifted_lines, n + keyLength, p + 2, n + keyLength // 2
+
+            #   Only right child.
+            if root.node.left.node is None:
+                lines, n, p, x = display(root.node.right)
+                nodeOutput = str(root.node.key)
+                keyLength = len(nodeOutput)
+                first_line = nodeOutput + x * '_' + (n - x) * ' '
+                second_line = (keyLength + x) * ' ' + '\\' + (n - x - 1) * ' '
+                shifted_lines = [keyLength * ' ' + line for line in lines]
+                return [first_line, second_line] + shifted_lines, n + keyLength, p + 2, keyLength // 2
+
+            #   Two children.
+            left, n, p, x = display(root.node.left)
+            right, m, q, y = display(root.node.right)
+            nodeOutput = str(root.node.key)
+            keyLength = len(nodeOutput)
+            first_line = (x + 1) * ' ' + (n - x - 1) * '_' + nodeOutput + y * '_' + (m - y) * ' '
+            second_line = x * ' ' + '/' + (n - x - 1 + keyLength + y) * ' ' + '\\' + (m - y - 1) * ' '
+            if p < q:
+                left += [n * ' '] * (q - p)
+            elif q < p:
+                right += [m * ' '] * (p - q)
+            zipped_lines = zip(left, right)
+            lines = [first_line, second_line] + [a + keyLength * ' ' + b for a, b in zipped_lines]
+            return lines, n + m + keyLength, max(p, q) + 2, n + keyLength // 2
+
+        lines = []
+        if self.node != None:
+            lines, *_ = display(self)
+            print("\t\t=== AVL Tree ===")
+            print()
+        if lines == []:
+            print("No tree found, please rebuild a new Tree.\n")
+            return -1
+        for line in lines:
+            print(line)
+        print()
+        
+class Node():
+    def __init__(self, key):
+        self.key = key
+        self.left = None 
+        self.right = None
+        
 #############################################
 #method displays the options that the user can pick from    
 def optionDisplay(displayNumber):     
     if displayNumber == 1:
-        print("\nQuestion 3: AVL tree: deleting a node\n")
+        print("\n\nQuestion 3: AVL tree: deleting a node\n")
         print("\n1. Pre-load a sequence of integers to build a AVL tree \n")
         print("2. Manually enter integer values/keys, one by one, to build an AVL tree\n")
         print("3. Exit\n")
     elif displayNumber == 2:
-        print("\n\nQuestion 3: AVL tree: deleting a node\n")
+        print("\n\n\nQuestion 3: AVL tree: deleting a node\n")
         print("1. Display the AVL tree, showing the height and balance factor for each node.\n")
         print("2. Print the pre-order, in-order, and post-order traversal sequences of the AVL tree\n")
         print("3. Print all leaf nodes of the AVL tree, and all non-leaf nodes (separately)\n")
@@ -549,8 +428,6 @@ def menuOneOption(optionNumber):
         
 #this method deals with the first menu option that the users has chosen
 def menuTwoOption(sequence):
-    bTree = BinaryTree()
-    inputtoTree(bTree, sequence)
     aTree = AVLTree()    
     inputtoTree(aTree, sequence)
     
@@ -559,13 +436,13 @@ def menuTwoOption(sequence):
         if optionNumber == 1:
             menuTwoOptionOne(aTree)
         elif optionNumber == 2:
-            menuTwoOptionTwo(bTree)
+            menuTwoOptionTwo(aTree)
         elif optionNumber == 3:
-            menuTwoOptionThree(bTree)
+            menuTwoOptionThree(aTree)
         elif optionNumber == 4:
-            menuTwoOptionFour(bTree)
+            menuTwoOptionFour(aTree)
         elif optionNumber == 5:
-            menuTwoOptionFive(bTree)          
+            menuTwoOptionFive(aTree)          
         else:
             break
         
@@ -612,52 +489,49 @@ def inputtoTree(Tree, sequence):
         Tree.insert(element)
     return
 
-def menuTwoOptionOne(bTree):
-     printTree(bTree.getNode())
+def menuTwoOptionOne(aTree):
+    aTree.printTree()
+    print("\n == AVL tree (printed left-side down, with [hights, balance_factors] & an \'L\' for each leaf node) ==\n")
+    aTree.display()
      
      
      
-def menuTwoOptionTwo(bTree):
+def menuTwoOptionTwo(aTree):
     print("\nPre-Order Traversal:\n")
-    bTree.preorder()
+    print(aTree.preorder_traverse())
     print("\n\nIn-Order Traversal:\n")
-    bTree.inorder()
+    print(aTree.inorder_traverse())
     print("\n\nPost-Order Traversal:\n")
-    bTree.postorder()
-    print("\n\nInverse-In-Order Traversal:\n")
-    bTree.inverse_inorder() 
+    print(aTree.postorder_traverse())
      
-def menuTwoOptionThree(bTree):
+def menuTwoOptionThree(aTree):
     print("\nAll Leaf nodes:\n")
-    bTree.leaf_BST()
+    aTree.leaf_AVL()
     print("\n\nAll Non-leaf nodes:\n")
-    bTree.non_leaf_BST()
+    aTree.non_leaf_AVL()
      
 
-def menuTwoOptionFour(bTree):
+def menuTwoOptionFour(aTree):
     try:
          number = input("Enter a integer: ")
          number = int(number)
-         inserted = bTree.insert(number)
+         inserted = aTree.insert(number)
     except ValueError:
          print("Invalid input!!! Please enter a valid integer")
     if inserted ==True:
-        print("\nInteger", number, "has been inserted into the BST")
-        print("\n\nInverse-In-Order Traversal:\n")
-        bTree.inverse_inorder()
+        print("\nInteger", number, "has been inserted into the AVL")
     
 
-def menuTwoOptionFive(bTree):
+def menuTwoOptionFive(aTree):
     try:
          number = input("Enter a integer: ")
          number = int(number)
-         deleted = bTree.delete_(number)[0]
+         deleted = aTree.delete_(number)[0]
     except ValueError:
          print("Invalid input!!! Please enter a valid integer")
     if deleted == True:
-        print("\nInteger", number, "has been deleted into the BST")
-        print("\n\nInverse-In-Order Traversal:\n")
-        bTree.inverse_inorder()
+        print("\nInteger", number, "has been deleted into the AVL")
+        
      
     
 

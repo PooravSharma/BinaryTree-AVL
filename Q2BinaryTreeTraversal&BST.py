@@ -310,7 +310,7 @@ def optionDisplay(displayNumber):
         print("2. Manually enter integer values, one by one, to build a BST\n")
         print("3. Exit\n")
     elif displayNumber == 2:
-        print("\n\nQuestion 2: Application to binary tree traversal & BST\n")
+        print("\n\n\nQuestion 2: Application to binary tree traversal & BST\n")
         print("1. Display the tree shape of current BST, and then show the pre-order, in-order, post-order and inverse-in-order traversal sequences of the BST\n")
         print("2. Show all leaf nodes of the BST, and all non-leaf nodes (separately)\n")
         print("3. Show a sub-tree and count its nodes\n")
